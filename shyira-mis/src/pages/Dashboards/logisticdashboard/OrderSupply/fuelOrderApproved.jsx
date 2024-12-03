@@ -23,7 +23,7 @@ const ForwardedRequests = () => {
 
   const fetchForwardedRequests = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/logisticFuel`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/logisticFuel/approved-fuel-order`);
       setForwardedRequests(response.data);
     } catch (error) {
       console.error('Error fetching forwarded requests:', error);
@@ -87,7 +87,7 @@ const ForwardedRequests = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/logisticFuel/recieved-fuel/${selectedRequest._id}`,{
+          const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/logisticFuel/recieved-fuel/${selectedRequest._id}`,{
         
           receivedBy : {
             firstName: user.firstName,
@@ -95,6 +95,17 @@ const ForwardedRequests = () => {
             signature: user.signature
           }
         });
+  // Optionally refresh the list of forwarded requests
+
+  setForwardedRequests(prevRequests => 
+
+    prevRequests.map(req => 
+
+      req._id === response.data._id ? response.data : req
+
+    )
+
+  );
 
           Swal.fire({
             title: 'Success!',
@@ -158,7 +169,7 @@ const ForwardedRequests = () => {
                 <td>Request of fuel from logistic office prepared by {request.hodName}</td>
                 <td>{request.supplierName}</td>
                 <td>{new Date(request.createdAt).toDateString()}</td>
-                <td><b className='status-verified'>{request.status}</b></td>
+                <td><b className='status-approved'>{request.status}</b></td>
               </tr>
             ))}
           </tbody>

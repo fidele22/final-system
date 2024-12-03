@@ -5,6 +5,7 @@ import { FaQuestionCircle, FaEdit, FaTimes, FaTimesCircle, FaCheck, FaCheckCircl
 import ItemOrderStatus from './orderstatus'; 
 import ItemDecision from './RecievedOrder';
 import FuelFormOrder from './fuelorder';
+import FuelOrderApproved from './fuelOrderApproved'
 import FuelOrderStatus from './fuelOrderstatus';
 import MakeRepairRequisition from '../repairRequisition/repairRequisition'
 import SearchableDropdown from './searchable'; // Import the custom dropdown component
@@ -167,7 +168,9 @@ const LogisticRequestForm = () => {
         <button className='recieved-item' onClick={handleFuelOrderApprovedClick}>
           <i className="fas fa-edit"></i> Fuel Order Status
         </button>
-
+        <button className='recieved-item' onClick={() => setActiveComponent('fuel-order-approved')}>
+          <i className="fas fa-edit"></i> fuel order approved
+        </button>
         <button className='make-requisition' onClick={() => setActiveComponent('repair-requisition')}>
           <i className="fas fa-edit"></i> Make repair Requisition
         </button>
@@ -181,7 +184,9 @@ const LogisticRequestForm = () => {
         <FuelFormOrder />
       ) : activeComponent === 'approved' ? (
         <FuelOrderStatus />
-      )  : activeComponent === 'repair-requisition' ? (
+      )  : activeComponent === 'fuel-order-approved' ? (
+        <FuelOrderApproved />
+      )   : activeComponent === 'repair-requisition' ? (
         <MakeRepairRequisition />
       ) : (
         <div className="requestion">

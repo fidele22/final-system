@@ -2,7 +2,8 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-
+const FuelStock = require('../models/fuelStock'); 
+const FuelStockHistory = require('../models/fuelStockHistory'); 
 const LogisticFuelRequest = require('../models/logisticfuelrequest'); 
 const RejectedFuelOrder = require('../models/logisticfuelRejected')
 // fuel logistic requisition 
@@ -69,6 +70,17 @@ router.get('/pending-fuel-order', async (req, res) => {
 router.get('/verified-fuel-order', async (req, res) => {
   try {
     const verifiedRequests = await LogisticFuelRequest.find({ status: 'Verified' });
+    res.json(verifiedRequests);
+  } catch (error) {
+    console.error('Error fetching verified requests:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Route to fetch verified fuel orders
+router.get('/approved-fuel-order', async (req, res) => {
+  try {
+    const verifiedRequests = await LogisticFuelRequest.find({ status: 'Approved' });
     res.json(verifiedRequests);
   } catch (error) {
     console.error('Error fetching verified requests:', error);
@@ -216,35 +228,118 @@ router.post('/approve-fuel-order/:id', async (req, res) => {
   }
 });
 
-// Route to mark  a fuel order as recieve
 router.post('/recieved-fuel/:id', async (req, res) => {
+
   try {
+
     const requestId = req.params.id;
+
     if (!mongoose.Types.ObjectId.isValid(requestId)) {
+
       return res.status(400).json({ message: 'Invalid ID' });
+
     }
+
 
     const request = await LogisticFuelRequest.findById(requestId);
+
     if (!request) {
+
       return res.status(404).json({ message: 'Request not found' });
+
     }
+
+
+    // Update the receivedBy and status
+
     request.receivedBy = {
+
       firstName: req.body.receivedBy.firstName,
+
       lastName: req.body.receivedBy.lastName,
+
       signature: req.body.receivedBy.signature,
+
     };
-    request.status = 'Recieved'; // Change status to approved
+
+    request.status = 'Received'; // Change status to received
+
+
+    // Update the fuel stock and log history
+
+    for (const item of request.items) {
+
+      const fuelStock = await FuelStock.findOne({ fuelType: item.desitination }); // Assuming destination is the fuel type
+
+      if (fuelStock) {
+
+        // Update the stock quantity
+
+        const previousQuantity = fuelStock.quantity; // Store previous quantity for history
+
+        fuelStock.quantity += item.quantityRequested; // Add the requested quantity to the stock
+
+        await fuelStock.save(); // Save the updated stock
+
+
+        // Log the stock update in FuelStockHistory
+
+        const fuelStockHistory = new FuelStockHistory({
+
+          itemId: fuelStock._id,
+
+          carplaque: item.desitination, // Assuming 'destination' is linked to carPlaque
+
+          entry: {
+
+            quantity: item.quantityRequested,
+
+            pricePerUnit: fuelStock.pricePerUnit,
+
+            totalAmount: item.totalPrice,
+
+          },
+
+          balance: {
+
+            quantity: fuelStock.quantity,
+
+            pricePerUnit: fuelStock.pricePerUnit,
+
+            totalAmount: fuelStock.totalAmount,
+
+          },
+
+          updatedAt: Date.now(),
+
+        });
+
+
+        // Save history record
+
+        await fuelStockHistory.save();
+
+      }
+
+    }
+
 
     // Save the updated request
+
     await request.save();
 
-    res.json(request);
-  } catch (error) {
-    console.error('Error approving request:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
 
+    res.json(request);
+
+  } catch (error) {
+
+    console.error('Error approving request:', error);
+
+    res.status(500).json({ message: 'Server error' });
+
+  }
+
+});
 
 // Route to handle rejection of a logistic fuel request
 // Route to mark  a fuel order as recieve
