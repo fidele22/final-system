@@ -23,17 +23,17 @@ router.post('/login', async (req, res) => {
     }
 
     if (!user.role) {
-      return res.status(400).json({ message: 'User role not assigned. Contact admin.' });
+      return res.status(400).json({ message: 'User  role not assigned. Contact admin.' });
     }
 
+    // Include privileges in the response
     const token = jwt.sign({ userId: user._id, role: user.role.name }, JWT_SECRET, { expiresIn: '8h' });
-    res.json({ token, role: user.role.name });
+    res.json({ token, role: user.role.name, privileges: user.role.privileges }); // Include privileges
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 
 
 //reseting password

@@ -12,10 +12,7 @@ const UserRequestForm = () => {
   const [stockQuantities, setStockQuantities] = useState({});
   const [itemOptions, setItemOptions] = useState([]);
   const [user, setUser ] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const tabId = sessionStorage.getItem('currentTab');
-  const token = sessionStorage.getItem(`token_${tabId}`); 
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -54,23 +51,36 @@ const UserRequestForm = () => {
   };
 
   useEffect(() => {
-    const fetchUser  = async () => {
+    const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/profile/profile`, {
+        const currentTab = sessionStorage.getItem('currentTab');
+
+        if (!currentTab) {
+          setError('No tab ID found in sessionStorage');
+          return;
+        }
+
+        const token = sessionStorage.getItem(`token_${currentTab}`);
+        if (!token) {
+          setError('Token not found');
+          return;
+        }
+
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users/profile`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
           },
         });
+
         setUser (response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        setError('Invalid token or unable to fetch profile data');
       }
     };
 
-    fetchUser ();
-  }, [token]);
+    fetchUserProfile();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

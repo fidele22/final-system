@@ -41,22 +41,40 @@ const togglePasswordVisibility = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
+
     e.preventDefault();
-    if (validateLoginForm()) {
-      try {
-        const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, { email, password });
-        console.log('Login response:', res.data); // Check what is returned
-        const { token, role } = res.data;
   
-        // Generate a unique key for the current tab (optional, can store token directly in sessionStorage)
+    if (validateLoginForm()) {
+  
+      try {
+  
+        const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, { email, password });
+  
+        console.log('Login response:', res.data); // Check what is returned
+  
+        const { token, role, privileges } = res.data; // Destructure privileges from response
+  
+  
+        // Generate a unique key for the current tab
+  
         const tabId = Date.now() + Math.random().toString(36);
   
-        // Save the token in sessionStorage instead of localStorage
+  
+        // Save the token in sessionStorage
+  
         sessionStorage.setItem(`token_${tabId}`, token);
+  
         
+  
+        // Save the privileges in sessionStorage
+  
+        sessionStorage.setItem(`privileges_${tabId}`, JSON.stringify(privileges)); // Store privileges as a string
+  
+        
+  
         // Save the tab ID for reference in other parts of the app
+  
         sessionStorage.setItem('currentTab', tabId);
   
         // Redirect to the appropriate dashboard based on role
@@ -81,8 +99,6 @@ const togglePasswordVisibility = () => {
       }
     }
   };
-  
-
   // Registration logic
   const [formData, setFormData] = useState({
     firstName: '',
