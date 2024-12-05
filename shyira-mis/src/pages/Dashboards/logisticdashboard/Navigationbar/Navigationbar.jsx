@@ -45,23 +45,12 @@ const Navbar = ({ setCurrentPage }) => {
           <FaHome /> Overview
         </li>
         <li onClick={() => setCurrentPage('view-items')}> <FaList /> Item stock </li>
-        <li onClick={() => setCurrentPage('make-order')}>
-                <FaClipboardCheck /> Order Supplies
-              </li>
-       
-        
-        <li onClick={() => setCurrentPage('view-requisition')}>
-          <FaClipboardCheck /> Item Requisition
-        </li>
-          
-          <li onClick={() => setCurrentPage('fuel-requisition')}>
-                <FaClipboardCheck /> Fuel Requisition
-              </li>
+        <li onClick={() => setCurrentPage('make-order')}><FaClipboardCheck /> Order Supplies  </li>    
+        <li onClick={() => setCurrentPage('view-requisition')}><FaClipboardCheck /> Item Requisition</li>
+        <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> Fuel Requisition</li>
           
        
-        <li onClick={() => setCurrentPage('view-cars')}>
-          <FaChartBar /> view cars data
-        </li>
+        <li onClick={() => setCurrentPage('view-cars')}> <FaChartBar /> view cars data</li>
         <li onClick={() => setCurrentPage('fuel-stock')}>
                 <FaPlus /> Fuel stock
               </li>

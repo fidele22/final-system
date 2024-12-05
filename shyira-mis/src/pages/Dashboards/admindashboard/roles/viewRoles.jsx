@@ -16,12 +16,12 @@ const ViewPosition = () => {
   const availablePrivileges = [
     'manage users',
     'view reports',
-    'Make requisition',
+    'request_item',
     'view_items',
     'view_overview',
-    'Approve user requisition',
-    'verify logistic requisition',
-    'Approve logistic requisiton',
+    'request_fuel',
+    'update_car_data',
+    'view_help_center',
     
   ];
 
@@ -175,7 +175,7 @@ const ViewPosition = () => {
               onChange={(e) => setRoleName(e.target.value)}
             />
             <div>
-            <p>Assign privilege</p>
+            <p>Assign privileges </p>
               {availablePrivileges.map((privilege) => (
                 <div key={privilege}>
                
