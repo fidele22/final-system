@@ -18,3 +18,27 @@
 .role-privileges li{
     color: rgb(117, 116, 116);
 }
+/* Container for privileges */
+.edit-form {
+    width: 700px;
+}
+.edit-form div {
+    display: flex;
+    justify-content: space-between; /* Distribute items left and right */
+    flex-wrap: wrap; /* Allow wrapping if necessary */
+    gap: 10px; /* Add spacing between items */
+  }
+  
+  /* Individual privilege label styling */
+  .edit-form label {
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+    font-size: 16px;
+  }
+  
+  /* Optional styling for checkboxes */
+  .edit-form input[type="checkbox"] {
+    margin-right: 10px; /* Space between checkbox and label text */
+  }
+  

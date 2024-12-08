@@ -39,19 +39,20 @@ const Navbar = ({ setCurrentPage, privileges }) => {
         {privileges.includes('update_car_data') && (
           <li onClick={() => setCurrentPage('fill-cardata')}><FaBoxOpen /> Update Car Data</li>
         )}
+
         {/* links supposed to logistic role */}
 
-          {privileges.includes('Manage_item_stock') && (
+        {privileges.includes('Manage_item_stock') && (
           <li onClick={() => setCurrentPage('view-items-stock')}> <FaList /> Item stock </li>
         )}
         {privileges.includes('Make_item_order') && (
-            <li onClick={() => setCurrentPage('make-order')}><FaClipboardCheck /> Order Supplies  </li>
+          <li onClick={() => setCurrentPage('make-order')}><FaClipboardCheck /> Order Supplies  </li>
         )}
         {privileges.includes('view_request_item') && (
-         <li onClick={() => setCurrentPage('view-requisition')}><FaClipboardCheck /> Item Requisition</li>
+          <li onClick={() => setCurrentPage('view-requisition')}><FaClipboardCheck /> Item Requisition</li>
         )}
         {privileges.includes('view_request_fuel') && (
-         <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> Fuel Requisition</li>
+          <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> Fuel Requisition</li>
         )}
         {privileges.includes('View_car_data') && (
           <li onClick={() => setCurrentPage('view-cars')}> <FaChartBar /> view cars data</li>

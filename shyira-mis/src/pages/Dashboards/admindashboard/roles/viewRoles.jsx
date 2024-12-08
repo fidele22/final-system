@@ -22,6 +22,17 @@ const ViewPosition = () => {
     'request_fuel',
     'update_car_data',
     'view_help_center',
+    'Manage_item_stock',
+    'Make_item_order',
+    'view_request_item',
+    'view_request_fuel',
+    'View_car_data',
+    'view_fuel_stock',
+    'view_item_report',
+    'view_fuel_report',
+    'view_fuel_report',
+
+
     
   ];
 

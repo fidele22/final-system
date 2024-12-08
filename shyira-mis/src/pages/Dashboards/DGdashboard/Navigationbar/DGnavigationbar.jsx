@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaHome, FaPlus, FaFileExcel,FaTrash , FaList, FaBoxOpen, FaClipboardCheck, 
   FaClipboardList, FaChartBar, FaUser, FaSignOutAlt,FaLifeRing ,FaGasPump } from 'react-icons/fa';
-import '../../logisticdashboard/Navigationbar/Navigationbar.css';
+import './Dafnavigationbar.css';
 import axios from 'axios';
 
 const Navbar = ({ setCurrentPage }) => {
