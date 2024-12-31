@@ -1,33 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { FaQuestionCircle, FaEdit, FaTimes, FaCheckCircle, FaTimesCircle, FaTrash, FaCheck } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import Swal from 'sweetalert2'; 
+//import './styling.css';
 
 const ForwardedRequests = () => {
   const [forwardedRequests, setForwardedRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [filterStatus, setFilterStatus] = useState(''); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(15);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
-  const [logisticUsers, setLogisticUsers] = useState([]);
+  const [isSigned, setIsSigned] = useState(false); // New state to track if signed
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const tabId = sessionStorage.getItem('currentTab');
+  const token = sessionStorage.getItem(`token_${tabId}`); 
 
-  useEffect(() => {
-    fetchForwardedRequests();
-    fetchLogisticUsers();
-  }, []);
 
-  const fetchLogisticUsers = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users/logistic-users`);
-      setLogisticUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching logistic users:', error);
-    }
-  };
+
+  
+  
+  
+    useEffect(() => {
+      const fetchUser  = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/profile/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUser (response.data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+
+
+
+      fetchForwardedRequests ();
+      fetchUser ();
+    }, [token]);
 
   const fetchForwardedRequests = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest`);
-      setForwardedRequests(response.data);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest/approved-item-order`);
+      // Sort requests by createdAt in descending order
+      const sortedRequests = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setForwardedRequests(sortedRequests);
     } catch (error) {
       console.error('Error fetching forwarded requests:', error);
     }
@@ -49,15 +74,13 @@ const ForwardedRequests = () => {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, reject it!',
       customClass: {
-        popup: 'custom-swal', // Apply custom class to the popup
+        popup: 'custom-swal',
       }
     });
 
     if (confirmReject.isConfirmed) {
       try {
-        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest/rejectItemOrder/${selectedRequest._id}`, {
-          // You can send additional data if needed
-        });
+        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest/rejectItemOrder/${selectedRequest._id}`);
         setForwardedRequests(prevRequests => prevRequests.filter(req => req._id !== selectedRequest._id));
         setSelectedRequest(null);
         Swal.fire({
@@ -123,7 +146,7 @@ const ForwardedRequests = () => {
       setForwardedRequests(prevRequests =>
         prevRequests.map(req => (req._id === response.data._id ? response.data : req))
       );
-      alert('Re quisition updated successfully');
+      alert('Requisition updated successfully');
     } catch (error) {
       console.error('Error updating request:', error);
     }
@@ -131,12 +154,46 @@ const ForwardedRequests = () => {
 
   const handleVerifySubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest/verified/${selectedRequest._id}`);
-      setSelectedRequest(response.data);
+
+    if (!isSigned) {
+  
+      Swal.fire({
+        title: 'Error!',
+        text: 'You must sign before approving this requistion.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+  
+      });
+  
+      return;
+  
+    }
+    const confirmReject = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to mark as received this requisition, You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, recieve it!',
+        customClass: {
+          popup: 'custom-swal',
+        }
+      });
+  
+      if (confirmReject.isConfirmed) {
+        try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/LogisticRequest/receivedItemOrder/${selectedRequest._id}`,{
+        receivedBy : {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          signature: user.signature
+        }
+    });
+    setSelectedRequest(response.data);
       Swal.fire({
         title: 'Success',
-        text: 'Verifying logistic item order successfully',
+        text: 'receiving logistic item order successfully',
         icon: 'success',
         confirmButtonText: 'OK',
         customClass: {
@@ -147,31 +204,94 @@ const ForwardedRequests = () => {
       console.error('Error approving request:', error);
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to verify item order',
+        text: 'Failed to receiving item order',
         icon: 'error',
         confirmButtonText: 'OK',
         customClass: {
           popup: 'custom-swal',
         }
-      });
-    }
+    });
+}
+}
+};
+
+const handleSignClick = () => {
+
+    setIsSigned(true); // Set signed state to true when sign button is clicked
+  
   };
+  
+  const handleFilterChange = (e) => {
+    setFilterStatus(e.target.value);
+  };
+
+  const filteredRequests = forwardedRequests.filter(request => {
+    return request.status.toLowerCase().includes(filterStatus.toLowerCase());
+  });
+
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const indexOfLastRequest = currentPage * itemsPerPage;
+  const indexOfFirstRequest = indexOfLastRequest - itemsPerPage;
+  const currentRequests = filteredRequests.slice(indexOfFirstRequest, indexOfLastRequest);
 
   return (
     <div className={`verified-requist ${selectedRequest ? 'dim-background' : ''}`}>
       <div className="order-navigation">
-        <div className="navigation-title">
+        <div className='navigation-title'>
           <h2>Requisition from logistic office for item</h2>
         </div>
-        <ul>
-          {forwardedRequests.slice().reverse().map((request, index) => (
-            <li key={index}>
-              <p onClick={() => handleRequestClick(request._id)}>
-                Requisition Form from <b>logistic</b> done on {new Date(request.date).toDateString()}
-              </p>
-            </li>
-          ))}
-        </ul>
+        
+        <div className='statusFilter'>
+          <label>Filter/search by Status: </label>
+          <input
+            type="text"
+            id="statusFilter"
+            value={filterStatus}
+            onChange={handleFilterChange}
+            placeholder="Enter status (e.g., Pending, Approved)"
+          />
+        </div>
+
+        <table className="requests-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Request type</th>
+              <th>Supplier Name</th>
+              <th>Done on</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentRequests.map((request, index) => (
+              <tr key={request._id} onClick={() => handleRequestClick(request._id)}>
+                <td>{index + 1 + indexOfFirstRequest}</td>
+                <td>Request of item from logistic office prepared by {request.logisticName}</td>
+                <td>{request.supplierName}</td>
+                <td>{new Date(request.createdAt).toDateString()}</td>
+                <td>
+                  <b className={`status-${request.status?.toLowerCase()}`}>{request.status}</b>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="pagination">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
       {selectedRequest && (
         <div className="request-details-overlay">
@@ -241,8 +361,8 @@ const ForwardedRequests = () => {
             ) : (
               <>
                 <div className="form-navigation">
-                  <button className='verify-requisition' onClick={handleVerifySubmit}>Verify Request</button>
-                  <button className='reject-request' onClick={handleRejectRequest}>Reject Request</button>
+                  <button className='verify-requisition' onClick={handleVerifySubmit}>Mark as recieved</button>
+                  <button className='sign-button' onClick={handleSignClick}>Sign</button>
                   <button></button>
                   <label className='request-close-btn' onClick={() => setSelectedRequest(null)}><FaTimes /></label>
                 </div>
@@ -283,28 +403,69 @@ const ForwardedRequests = () => {
                   </tbody>
                 </table>
 
-                <div className="daf-signature-section">
-                  <div className='logistic-signature'>
-                    <h3>Logistic Office:</h3>
-                    <label htmlFor="">Prepared By:</label>
-                    {logisticUsers.map(user => (
-                      <div key={user._id} className="logistic-user">
-                        <p>{user.firstName} {user.lastName}</p>
-                        {user.signature ? (
-                          <img src={`${process.env.REACT_APP_BACKEND_URL}/${user.signature}`} alt={`${user.firstName} ${user.lastName} Signature`} />
-                        ) : (
-                          <p>No signature available</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                <div className="signature-section">
+                <div className='logistic-signature'>
+                <h4>Logistic Office</h4>
+                <label>Prepared By:</label>
+                <span>{selectedRequest.logisticName || ''}</span><br />
+                <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.logisticSignature}`} alt="HOD Signature"
+                className='signature-img' />
                 </div>
+                <div className='daf-signature'>
+<h4>DAF Office</h4>
+  <label>Verified By:</label>
+
+  <p>{selectedRequest.verifiedBy.firstName} {selectedRequest.verifiedBy.lastName}</p>
+
+  {selectedRequest.verifiedBy.signature ? (
+
+    <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.verifiedBy.signature}`} alt="Approved Signature" className='signature-img' />
+
+  ) : (
+
+    <p>No signature available</p>
+
+  )}
+
+     </div>
+
+     <div className='daf-signature'>
+<h4>DG Office</h4>
+  <label>Approved By:</label>
+
+  <p>{selectedRequest.approvedBy.firstName} {selectedRequest.approvedBy.lastName}</p>
+
+  {selectedRequest.approvedBy.signature ? (
+
+    <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.approvedBy.signature}`} alt="Approved Signature" className='signature-img' />
+
+  ) : (
+
+    <p>No signature available</p>
+
+  )}
+
+     </div>
+           {isSigned && (
+         <div className="daf-signature">
+           <h4>Logistic Office</h4>
+           <label htmlFor="dgName">Recieved By:</label>
+           <p>{user.firstName} {user.lastName}</p>
+           {user.signature ? (
+             <img src={`${process.env.REACT_APP_BACKEND_URL}/${user.signature}`} alt="Signature" className='signature-img' />
+           ) : (
+             <p>No signature available</p>
+           )}
+       </div>
+     )}
+    
+                  </div>
+            
               </>
             )}
           </div>
         </div>
       )}
-   
     </div>
   );
 };

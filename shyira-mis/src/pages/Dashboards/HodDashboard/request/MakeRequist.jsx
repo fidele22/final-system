@@ -66,7 +66,7 @@ const UserRequestForm = () => {
           return;
         }
 
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/users/profile`, {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/profile/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

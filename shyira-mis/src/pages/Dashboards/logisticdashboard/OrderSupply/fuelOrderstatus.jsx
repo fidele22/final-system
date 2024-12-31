@@ -10,7 +10,7 @@ const ForwardedRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1); // State for current page
-  const [itemsPerPage] = useState(5); // Number of items per page
+  const [itemsPerPage] = useState(15); // Number of items per page
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser ] = useState(null);

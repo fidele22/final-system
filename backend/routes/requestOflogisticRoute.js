@@ -1,14 +1,13 @@
 const express = require('express');
 const multer = require('multer');
+const mongoose = require('mongoose');
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 const Item = require('../models/stockItems');
-const LogisticRequest = require('../models/requestOfLogistic');
-const VerifiedLogisticRequest = require ('../models/logisticRequestVerified')
-const ApprovedLogisticRequest =require('../models/approvedLogisticRequest')
-const RecievedLogisticRequest = require('../models/recievedLogisticRequest')
-const RejectedItemOrder = require('../models/logisticItemRejected')
-
+const LogisticItemRequest = require('../models/requestOfLogistic');
+const StockData = require('../models/stockData'); // Adjust the path to your StockData model
+const StockItem = require('../models/stockItems'); // Adjust the path to your StockItems model
+const StockHistory = require('../models/stockHistory');
 
 
 // fetching item name
@@ -27,7 +26,7 @@ router.post('/submit', upload.none(), async (req, res) => {
   try {
     console.log('Request Body:', req.body); // Log the request body
 
-    const { supplierName, items, date } = req.body;
+    const { supplierName,logisticName,  logisticSignature,items, date } = req.body;
 
     // Ensure items is defined and a valid JSON string
     if (!items) {
@@ -60,10 +59,12 @@ router.post('/submit', upload.none(), async (req, res) => {
     }));
 
     // Create userRequest
-    const newRequest = new LogisticRequest({
+    const newRequest = new LogisticItemRequest({
       supplierName,
       items: validItems,
       date,
+      logisticName,
+      logisticSignature,
     });
 
     await newRequest.save();
@@ -78,109 +79,265 @@ router.post('/submit', upload.none(), async (req, res) => {
 // Route to fetch all logistic requests
 router.get('/', async (req, res) => {
   try {
-    const logisticrequests = await LogisticRequest.find();
+    const logisticrequests = await LogisticItemRequest.find();
     res.json(logisticrequests);
   } catch (err) {
     console.error('Error:', err);
     res.status(500).json({ message: 'Server Error' });
   }
 });
-// Route to fetch all logistic requests
-router.get('/verified', async (req, res) => {
+
+//fetching all pending item logistic request
+router.get('/pending-item-order', async (req, res) => {
   try {
-    const logisticrequests = await VerifiedLogisticRequest.find();
-    res.json(logisticrequests);
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-//router to fetch approved logistic request from approved 
-router.get('/approved-order', async (req, res) => {
-  try {
-    const approvedlogisticrequests = await ApprovedLogisticRequest.find();
-    res.json(approvedlogisticrequests);
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-//router to fetch received logistic request from recievedlogistci request collection
-router.get('/received-order', async (req, res) => {
-  try {
-    const receivedlogisticrequests = await RecievedLogisticRequest.find();
-    res.json(receivedlogisticrequests);
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-//router to fetch received logistic request from recievedlogistci request collection
-router.get('/rejected-item-order', async (req, res) => {
-  try {
-    const receivedlogisticrequests = await RejectedItemOrder.find();
-    res.json(receivedlogisticrequests);
-  } catch (err) {
-    console.error('Error:', err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-router.get('/rejected-item-order/:id', async (req, res) => {
-  try {
-    const requestId = req.params.id;
-    const request = await RejectedItemOrder.findById(requestId); // Assuming Mongoose model
-    if (!request) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-    res.json(request);
+    const pendingRequests = await LogisticItemRequest.find({ status: 'Pending' });
+    res.json(pendingRequests);
   } catch (error) {
-    console.error('Error fetching request:', error);
+    console.error('Error fetching verified requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-// Example route to fetch a single logistic request by ID
-router.get('/:id', async (req, res) => {
+//fetching all pending item logistic request
+router.get('/verified-item-order', async (req, res) => {
   try {
-    const requestId = req.params.id;
-    const request = await LogisticRequest.findById(requestId); // Assuming Mongoose model
-    if (!request) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-    res.json(request);
+    const pendingRequests = await LogisticItemRequest.find({ status: 'Verified' });
+    res.json(pendingRequests);
   } catch (error) {
-    console.error('Error fetching request:', error);
+    console.error('Error fetching verified requests:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+  
+
+//fetching all approved item logistic request
+router.get('/approved-item-order', async (req, res) => {
+  try {
+    const pendingRequests = await LogisticItemRequest.find({ status: 'Approved' });
+    res.json(pendingRequests);
+  } catch (error) {
+    console.error('Error fetching verified requests:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+  
+
+router.post('/verifiedItemOrder/:id', async (req, res) => {
+
+  try {
+    const requestId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(400).json({ message: 'Invalid ID' });
+
+    }
+    const request = await LogisticItemRequest.findById(requestId);
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+
+    }
+
+
+    // Update the request with verified information
+
+    request.verifiedBy = {
+
+      firstName: req.body.verifiedBy.firstName,
+      lastName: req.body.verifiedBy.lastName,
+      signature: req.body.verifiedBy.signature,
+
+    };
+
+    request.status = 'Verified';
+
+    // Save the updated request
+
+    await request.save();
+
+
+    res.json(request);
+  } catch (error) {
+    console.error('Error verifying request:', error);
+    res.status(500).json({ message: 'Server error' });
+
+  }
+
 });
 
-//  route to fetch a single logistic order by ID
-router.get('/approved/:id', async (req, res) => {
-  try {
-    const requestId = req.params.id;
-    const request = await ApprovedLogisticRequest.findById(requestId); // Assuming Mongoose model
-    if (!request) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-    res.json(request);
-  } catch (error) {
-    console.error('Error fetching request:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+router.post('/approvedItemOrder/:id', async (req, res) => {
 
-//  route to fetch a single logistic order by ID
-router.get('/received/:id', async (req, res) => {
   try {
     const requestId = req.params.id;
-    const request = await RecievedLogisticRequest.findById(requestId); // Assuming Mongoose model
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(400).json({ message: 'Invalid ID' });
+
+    }
+    const request = await LogisticItemRequest.findById(requestId);
     if (!request) {
       return res.status(404).json({ message: 'Request not found' });
+
     }
+
+
+    // Update the request with verified information
+
+    request.approvedBy = {
+
+      firstName: req.body.approvedBy.firstName,
+      lastName: req.body.approvedBy.lastName,
+      signature: req.body.approvedBy.signature,
+
+    };
+
+    request.status = 'Approved';
+
+    // Save the updated request
+
+    await request.save();
+
+
     res.json(request);
   } catch (error) {
-    console.error('Error fetching request:', error);
+    console.error('Error verifying request:', error);
     res.status(500).json({ message: 'Server error' });
+
   }
+
+});
+router.post('/receivedItemOrder/:id', async (req, res) => {
+
+  try {
+
+    const requestId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+
+      return res.status(400).json({ message: 'Invalid ID' });
+
+    }
+
+
+    const request = await LogisticItemRequest.findById(requestId);
+
+    if (!request) {
+
+      return res.status(404).json({ message: 'Request not found' });
+
+    }
+
+
+    // Update the request with verified information
+
+    request.receivedBy = {
+
+      firstName: req.body.receivedBy.firstName,
+
+      lastName: req.body.receivedBy.lastName,
+
+      signature: req.body.receivedBy.signature,
+
+    };
+
+    request.status = 'Received';
+
+
+    // Update stock data based on received items
+
+    for (const item of request.items) {
+
+      const stockData = await StockData.findOne({ itemId: item.itemId });
+
+
+      if (stockData) {
+
+        // Calculate the total amount for the incoming entry
+
+        const incomingTotalAmount = item.quantityRequested * item.price;
+
+
+        // Update entry quantity and total amount
+
+        stockData.entry.quantity = item.quantityRequested;
+
+        stockData.entry.pricePerUnit = item.price;
+
+        stockData.entry.totalAmount = incomingTotalAmount;
+
+
+        // Update balance quantity and total amount
+
+        stockData.balance.quantity += item.quantityRequested;
+
+        stockData.balance.pricePerUnit = stockData.entry.pricePerUnit;
+
+
+        // Increment the balance total amount by adding the incoming total amount
+
+        stockData.balance.totalAmount += incomingTotalAmount;
+
+
+        // Save the updated stock data
+
+        await stockData.save();
+
+
+        // Update the corresponding StockItems
+
+        const stockItem = await StockItem.findById(stockData.itemId);
+
+        if (stockItem) {
+
+          stockItem.quantity = stockData.balance.quantity;
+
+          stockItem.pricePerUnit = stockData.balance.pricePerUnit;
+
+          stockItem.totalAmount = stockData.balance.totalAmount;
+
+          await stockItem.save();
+
+        }
+
+
+        // Log the update to the StockHistory collection
+
+        const stockHistory = new StockHistory({
+
+          itemId: stockData.itemId,
+
+          entry: stockData.entry,
+
+          exit: stockData.exit,
+
+          balance: stockData.balance,
+
+          updatedAt: Date.now(), // Set the updated date
+
+        });
+
+        await stockHistory.save();
+
+      } else {
+
+        console.error(`Stock data not found for item ID: ${item.itemId}`);
+
+      }
+
+    }
+
+
+    // Save the updated request
+
+    await request.save();
+
+
+    res.json(request);
+
+  } catch (error) {
+
+    console.error('Error verifying request:', error);
+
+    res.status(500).json({ message: 'Server error' });
+
+  }
+
 });
 
 router.put('/:id', async (req, res) => {
@@ -222,135 +379,6 @@ router.put('/update-verified/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
-// Forward a request to the approved collection
-router.post('/verified/:id', async (req, res) => {
-  try {
-    const forwardedRequest = await LogisticRequest.findById(req.params.id);
-    
-    if (!forwardedRequest) {
-      return res.status(404).json({ message: 'Forwarded request not found' });
-    }
-    
-    // Create a new approved request and include the userId
-    const approvedRequest = new VerifiedLogisticRequest({
-     // userId: forwardedRequest.userId, // Include userId from forwarded request
-      supplierName: forwardedRequest.supplierName,
-      items: forwardedRequest.items,
-      date: forwardedRequest.date,
-     // clicked: req.body.clicked || false // Use the clicked status if provided, else default to false
-    });
-
-    await approvedRequest.save();
-
-    // Optionally, remove the user request from the UserRequest collection
-         await LogisticRequest.findByIdAndDelete(req.params.id);
-
-         
-    res.status(201).json(approvedRequest);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-
-// Forward a request to the approved collection
-router.post('/approved/:id', async (req, res) => {
-  try {
-    const forwardedRequest = await VerifiedLogisticRequest.findById(req.params.id);
-    
-    if (!forwardedRequest) {
-      return res.status(404).json({ message: 'Forwarded request not found' });
-    }
-    
-    // Create a new approved request and include the userId
-    const approvedRequest = new ApprovedLogisticRequest({
-     // userId: forwardedRequest.userId, // Include userId from forwarded request
-      supplierName: forwardedRequest.supplierName,
-      items: forwardedRequest.items,
-      date: forwardedRequest.date,
-     // clicked: req.body.clicked || false // Use the clicked status if provided, else default to false
-    });
-
-    await approvedRequest.save();
-
-         // Optionally, remove the user request from the UserRequest collection
-   await VerifiedLogisticRequest.findByIdAndDelete(req.params.id);
-
-
-    res.status(201).json(approvedRequest);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Forward a request to the received order collection
-router.post('/received/:id', async (req, res) => {
-  try {
-    const forwardedRequest = await ApprovedLogisticRequest.findById(req.params.id);
-    
-    if (!forwardedRequest) {
-      return res.status(404).json({ message: 'Forwarded request not found' });
-    }
-    
-    // Create a new approved request and include the userId
-    const receivedLogisticRequest = new RecievedLogisticRequest({
-     // userId: forwardedRequest.userId, // Include userId from forwarded request
-      supplierName: forwardedRequest.supplierName,
-      items: forwardedRequest.items,
-      date: forwardedRequest.date,
-     // clicked: req.body.clicked || false // Use the clicked status if provided, else default to false
-    });
-
-    await receivedLogisticRequest.save();
-
-             // Optionally, remove the user request from the UserRequest collection
-   await ApprovedLogisticRequest.findByIdAndDelete(req.params.id);
-
-    res.status(201).json(receivedLogisticRequest);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Reject a logistic item request
-
-router.post('/rejectItemOrder/:id', async (req, res) => {
-
-  try {
-
-    const requestId = req.params.id;
-    const requestToReject = await LogisticRequest.findById(requestId);
-    if (!requestToReject) {
-
-      return res.status(404).json({ message: 'Request not found' });
-
-    }
-    // Create a new rejected request document
-
-    const rejectedRequest = new RejectedItemOrder({
-      date: requestToReject.date,
-      supplierName: requestToReject.supplierName,
-      items: requestToReject.items,
-      logisticSignature: requestToReject.logisticSignature,
-
-    });
-
-
-    // Save the rejected request
-
-    await rejectedRequest.save();
-    await LogisticRequest.findByIdAndDelete(requestId);
-    res.status(200).json({ message: 'Request rejected successfully' });
-
-  } catch (error) {
-
-    console.error('Error rejecting request:', error);
-    res.status(500).json({ message: 'Server error' });
-
-  }
-
 });
 
 

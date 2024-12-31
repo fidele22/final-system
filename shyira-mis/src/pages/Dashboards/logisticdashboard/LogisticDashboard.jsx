@@ -1,55 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import Navigation from '../navbar/Navbar'
+import { FaTimes, FaBars } from 'react-icons/fa'; // Correctly import icons
+import Navigation from '../navbar/Navbar';
 import Navbar from '../navsidebar/leftNavigationbar';
-import Footer from '../footer/Footer'
+import Footer from '../footer/Footer';
 import Overview from './Overview';
-import ViewItem from './addItem/parentStock'
+import ViewItem from './addItem/parentStock';
 import AddItem from './addItem/addingitem';
-import MakeRequist from './OrderSupply/MakeRequist'
-import FuelOrder from './OrderSupply/fuelorder'
-import OrderStatus from './OrderSupply/orderstatus'
-import ReceivedOrder from './OrderSupply/RecievedOrder'
-import ViewCars from './fuelRequisition/viewcars'
-import LogisticProfile from '../UserProfile/profile'
+import MakeRequist from './OrderSupply/MakeRequist';
+import FuelOrder from './OrderSupply/fuelorder';
+import ViewCars from './fuelRequisition/viewcars';
+import LogisticProfile from '../UserProfile/profile';
 import StockReport from './StockReport/ItemReport';
 import ViewRequisition from './UserRequisitions/RequisitionsPages';
-import ViewFuelRequest from './fuelRequisition/fuelRequisitionPages'
-import FuelStock from './fuelRequisition/fuelStock'
-import FuelReport from './StockReport/FuelReport'
-//import ApprovedRequests from './Requests/approvedRequest';
+import ViewFuelRequest from './fuelRequisition/fuelRequisitionPages';
+import FuelStock from './fuelRequisition/fuelStock';
+import FuelReport from './StockReport/FuelReport';
 import RequisitionReceive from './receivedRequisitions/itemRequestReceived';
-import './contentCss/LogisticDashboard.css';
 import HelpCenter from '../helpcenter/helpcenter';
+import './contentCss/LogisticDashboard.css';
 
 const LogisticDashboard = () => {
   const [currentPage, setCurrentPage] = useState('overview');
   const [privileges, setPrivileges] = useState([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const tabId = sessionStorage.getItem('currentTab');
-    console.log('Current tab ID:', tabId); // Debugging log
-
     if (tabId) {
       const storedPrivileges = sessionStorage.getItem(`privileges_${tabId}`);
-      console.log('Stored privileges:', storedPrivileges); // Debugging log
-
       if (storedPrivileges) {
         try {
-          const parsedPrivileges = JSON.parse(storedPrivileges); // Parse the stored privileges
-          setPrivileges(parsedPrivileges); // Update state with parsed privileges
+          const parsedPrivileges = JSON.parse(storedPrivileges);
+          setPrivileges(parsedPrivileges);
         } catch (error) {
           console.error('Error parsing privileges from sessionStorage:', error);
-          setPrivileges([]); // Set to an empty array if parsing fails
+          setPrivileges([]);
         }
       } else {
-        console.warn('Privileges not found in sessionStorage');
-        setPrivileges([]); // Set to an empty array if no privileges are found
+        setPrivileges([]);
       }
     } else {
-      console.warn('No tab ID found in sessionStorage');
-      setPrivileges([]); // Set to an empty array if no tab ID is found
+      setPrivileges([]);
     }
   }, []);
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const renderContent = () => {
     switch (currentPage) {
@@ -57,59 +54,54 @@ const LogisticDashboard = () => {
         return <Overview />;
       case 'add-item':
         return <AddItem />;
-      case 'view-items':
+      case 'manage-items-stock':
         return <ViewItem />;
       case 'report':
         return <StockReport />;
       case 'fuel-report':
-        return <FuelReport />  
+        return <FuelReport />;
       case 'fuel-stock':
-        return <FuelStock />
+        return <FuelStock />;
       case 'make-order':
         return <MakeRequist />;
-      case 'order-status':
-          return <OrderStatus />;
-      case 'received-order':
-        return <ReceivedOrder />;
       case 'make-fuel-order':
-        return <FuelOrder />   
-
+        return <FuelOrder />;
       case 'fuel-requisition':
         return <ViewFuelRequest />;
-     
       case 'view-cars':
-        return <ViewCars />     
-     
-     
+        return <ViewCars />;
       case 'user-profile':
         return <LogisticProfile />;
-      case 'view-requisition':
+      case 'item-requisition':
         return <ViewRequisition />;
-
       case 'help-center':
-         return <HelpCenter />;
-      //  
+        return <HelpCenter />;
       default:
         return <Overview />;
     }
   };
 
   return (
-    <div className="daf-dashboards">
-    <Navigation setCurrentPage={setCurrentPage} />
-    <div className="content-navbar">
-    <Navbar setCurrentPage={setCurrentPage} privileges={privileges} />
-    </div>
-  
-
-    <div className="dafcontent-page">
-    <div className="Admincontent">
-        {renderContent()}
-     
+    <div className={`admin-dashboard ${isMenuOpen ? 'open' : ''}`}>
+      <div>
+        <Navigation setCurrentPage={setCurrentPage} />
+        <div className="menu-toggle" onClick={handleMenuToggle}>
+          {isMenuOpen ? <FaTimes /> : <FaBars />}
+        </div>
       </div>
-      <Footer />
+
+      <Navbar
+        setCurrentPage={setCurrentPage}
+        privileges={privileges}
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+      />
+
+      <div className="Admincontent-page">
+        <div className="Admincontent">{renderContent()}</div>
+        <Footer />
+      </div>
     </div>
-  </div>
   );
 };
 

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEye , FaEdit,FaSpinner, FaTimes, FaTimesCircle,
    FaCheck, FaCheckCircle, FaCheckDouble, FaCheckSquare } from 'react-icons/fa';
-import VerifiedOrder from './viewLogisticRequest'; 
-import ApprovedOrder from './approvedLogisticRequest';
-import ReceivedOrder from '../../logisticdashboard/OrderSupply/RecievedOrder'
-import RejecteditemOrder from '../../dafdashboard/requestOfLogistic/rejecteditemorder'
+import VerifiedOrder from './verifiedLogisticRequest'; 
+import Orderstatus from '../../dafdashboard/requestOfLogistic/ItemLogisticRequestStatus';
+
+
 
 
 
@@ -18,32 +18,20 @@ const UserFuelRequesition = () => {
     <div className="requistion">
       <div className="links">
       <button className='view-requisition' onClick={() => setActiveComponent('verifiedOrder')} >
-          <FaEye /> Verified Order
+          <FaEye /> Verified requisition
         </button>
         
-        <button className='make-fuel-order' onClick={() => setActiveComponent('approvedOrder')}>
-          <FaSpinner color='brown'/> Approved Order
-        </button>
-
-        <button className='recieved-item' onClick={() => setActiveComponent('recieved-order')}>
-          <FaCheckCircle color='green'/> Recieved Order
-        </button>
-
-        <button className='recieved-item' onClick={() => setActiveComponent('rejected-order')}>
-          <FaTimesCircle color='red'/>  Rejected Order
+        <button className='make-fuel-order' onClick={() => setActiveComponent('Orderstatus')}>
+          <FaSpinner color='brown'/> requisition status
         </button>
        
       </div>
 
       {activeComponent === 'verifiedOrder' ? (
         <VerifiedOrder />
-      ) : activeComponent === 'approvedOrder' ? (
-        <ApprovedOrder />
-      )  : activeComponent === 'recieved-order' ? (
-        <ReceivedOrder />
-      )   : activeComponent === 'rejected-order' ? (
-        <RejecteditemOrder />
-      )  :(
+      ) : activeComponent === 'Orderstatus' ? (
+        <Orderstatus />
+      ) :(
         <div>
     <p>Navigate to what you want to look.</p>
         </div>

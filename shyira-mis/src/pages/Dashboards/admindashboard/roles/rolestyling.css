@@ -1,7 +1,13 @@
+.role-privilegies-section{
+    margin-left: 2%;
+    margin-right: 4.5%;
+}
 .role-privileges{
+    display: flex;
     background-color: white;
     padding: 15px;
-    width: auto;
+    gap: 10px;
+    width: 100%;
     height: auto;
     border-radius: 5px;
 }
@@ -14,6 +20,7 @@
 .role-privileges h2{
     color: rgb(42, 42, 240);
     font-size: 17px;
+    text-align: center;
 }
 .role-privileges li{
     color: rgb(117, 116, 116);

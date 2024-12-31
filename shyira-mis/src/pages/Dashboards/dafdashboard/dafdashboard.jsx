@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { FaHome, FaUser , FaList, FaClipboardList, FaBurn, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import Navigation from '../navbar/Navbar'
 import Footer from '../footer/Footer'
-import Navbar from './Navigationbar/Dafnavigationbar';
+import Navbar from '../navsidebar/leftNavigationbar';
 import Overview from './Overview';
 import ViewUserRequest from './UserItemRequisitions/parentPage';
 import RecieveduserRequest from '../logisticdashboard/receivedRequisitions/itemRequestReceived';
 import ViewLogisticRequest from './requestOfLogistic/orderpages';
-import RecievedLogisticOrder from '../logisticdashboard/OrderSupply/RecievedOrder';
 import UserFuelRequest from './UserfuelRequest/userfuelrequestpage';
 import LogisticFuelOrder from './LogisticFuelOrders/logisticFuelOrderPages';
 import RepairLogisticOrder from './logisticRepairRequest/repairRequisitionPage';
@@ -19,7 +18,33 @@ import HelpCenter from '../helpcenter/helpcenter';
 
 const LogisticDashboard = () => {
   const [currentPage, setCurrentPage] = useState('overview');
+  const [privileges, setPrivileges] = useState([]);
 
+  useEffect(() => {
+    const tabId = sessionStorage.getItem('currentTab');
+    console.log('Current tab ID:', tabId); // Debugging log
+
+    if (tabId) {
+      const storedPrivileges = sessionStorage.getItem(`privileges_${tabId}`);
+      console.log('Stored privileges:', storedPrivileges); // Debugging log
+
+      if (storedPrivileges) {
+        try {
+          const parsedPrivileges = JSON.parse(storedPrivileges); // Parse the stored privileges
+          setPrivileges(parsedPrivileges); // Update state with parsed privileges
+        } catch (error) {
+          console.error('Error parsing privileges from sessionStorage:', error);
+          setPrivileges([]); // Set to an empty array if parsing fails
+        }
+      } else {
+        console.warn('Privileges not found in sessionStorage');
+        setPrivileges([]); // Set to an empty array if no privileges are found
+      }
+    } else {
+      console.warn('No tab ID found in sessionStorage');
+      setPrivileges([]); // Set to an empty array if no tab ID is found
+    }
+  }, []);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleMenuToggle = () => {
@@ -38,8 +63,6 @@ const LogisticDashboard = () => {
          return <RecieveduserRequest />
       case 'view-stock-items':
             return <ViewItems/>
-      case 'recieved-logistic-order':
-         return <RecievedLogisticOrder />
       case 'view-logistic-request':
           return <ViewLogisticRequest />
       case 'Fuel-logistic-Order':
@@ -65,7 +88,9 @@ const LogisticDashboard = () => {
       </div>
     </div>
 
-    <Navbar setCurrentPage={setCurrentPage} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+    <Navbar setCurrentPage={setCurrentPage} privileges={privileges}
+    isMenuOpen={isMenuOpen} 
+    setIsMenuOpen={setIsMenuOpen} />
     
     <div className="Admincontent-page">
       <div className="Admincontent">

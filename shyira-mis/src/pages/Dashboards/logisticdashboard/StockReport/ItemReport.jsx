@@ -3,6 +3,7 @@ import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
+
 import './itemreport.css';
 
 const StockHistoryTable = () => {
@@ -25,6 +26,9 @@ const StockHistoryTable = () => {
     balanceQuantity: 0,
     balanceTotalAmount: 0,
   });
+
+
+  // State for signature
 
 
   const fetchStockData = async () => {
@@ -322,6 +326,11 @@ const downloadPDF = async () => {
       <p>prepared by: </p>
       <h4>AMINI ABEDI</h4>
       <h4>LOGISTIC OFFICER</h4>
+       {/* name and signature */}
+       
+
+
+
         </div>
     
       </div>

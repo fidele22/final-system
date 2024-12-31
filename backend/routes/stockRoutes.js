@@ -86,43 +86,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Add stock entry for an item created
-//router.post('/', async (req, res) => {
-//const { itemId, entry = {}, exit = {}, balance = {} } = req.body;
-//
-//try {
-//const newStock = new Stock({
-//itemId,
-//entry: {
-//quantity: entry.quantity || 0,
-//pricePerUnit: entry.pricePerUnit || 0,
-//totalAmount: entry.totalAmount || 0
-//},
-//exit: {
-//quantity: exit.quantity || 0,
-//pricePerUnit: exit.pricePerUnit || 0,
-//totalAmount: exit.totalAmount || 0
-//},
-//balance: {
-//quantity: balance.quantity || 0,
-//pricePerUnit: balance.pricePerUnit || 0,
-//totalAmount: balance.totalAmount || 0
-//}
-//});
-//
-//const savedStock = await newStock.save();
-//res.status(201).json(savedStock);
-//} catch (error) {
-//res.status(400).json({ message: 'Error adding stock entry', error });
-//}
-//});
-//
-//// Middleware to validate ObjectId
-//function isValidObjectId(id) {
-//return mongoose.Types.ObjectId.isValid(id);
-//}
-//
-//// fetching item name
+
 //// GET request to fetch all stock items
 router.get('/', async (req, res) => {
   try {
@@ -172,17 +136,7 @@ return res.status(404).send('Stock entry not found');
      stock.balance.totalAmount += stock.entry.totalAmount;
      stock.balance.pricePerUnit = stock.entry.pricePerUnit; // Update price per unit based on the last entry
      }
-    // if (exit) {
-    // stock.exit = {
-    // quantity: exit.quantity || stock.exit.quantity,
-    // pricePerUnit: stock.entry.pricePerUnit,
-    // totalAmount: exit.quantity * (exit.pricePerUnit || stock.exit.pricePerUnit)
-    // };
-    // 
-    // stock.balance.quantity -= stock.exit.quantity;
-    // stock.balance.totalAmount -= stock.exit.totalAmount; 
-    // stock.balance.pricePerUnit = stock.entry.pricePerUnit; // Update price per unit based on the last exit
-    // }
+  
 
 await stock.save();
    // Update the corresponding StockItems

@@ -315,7 +315,7 @@ const LogisticRequestForm = () => {
          
 
           <button className='request-dowload-btn' onClick={downloadPDF}>Download Pdf</button>
-          <button className='request-edit-btn' onClick={handleEditClick}>Edit</button>
+          {/* <button className='request-edit-btn' onClick={handleEditClick}>Edit</button> */}
           <button></button>
              <label className='request-close-btn' onClick={() => setSelectedRequest(null)}><FaTimes /></label>
           </div>
@@ -365,7 +365,7 @@ const LogisticRequestForm = () => {
                   <label htmlFor="hodName">Name of HOD:</label>
                     {selectedRequest.hodName && <p>{selectedRequest.hodName}</p>}
                     {selectedRequest.hodSignature ? (
-                      <img src={`http://localhost:5000/${selectedRequest.hodSignature}`} alt="HOD Signature" />
+                      <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.hodSignature}`} alt="HOD Signature" />
                     ) : (
                       <p>No HOD signature available</p>
                     )}

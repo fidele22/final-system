@@ -39,14 +39,6 @@ const ForwardedRequests = () => {
     }
   };
 
-//  const fetchForwardedRequests = async () => {
-//    try {
-//      const response = await axios.get('http://localhost:5000/api/forwardedrequests/items');
-//      setForwardedRequests(response.data);
-//    } catch (error) {
-//      console.error('Error fetching forwarded requests:', error);
-//    }
-//  };
 
   const fetchForwardedRequests = async () => {
     try {
@@ -243,14 +235,14 @@ if (loading) return <p>Loading...</p>;
         </div>
       )}
 
-                <div className="daf-signature-section">
+                <div className="signature-section">
                 <div className="hod-signature">
                   <h3 htmlFor="hodName">Name of HOD:</h3>
                   <label htmlFor="">Prepared By:</label>
                      <p >{selectedRequest.hodName}</p>
               
                     {selectedRequest.hodSignature ? (
-                      <img src={`http://localhost:5000/${selectedRequest.hodSignature}`} alt="HOD Signature" />
+                      <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.hodSignature}`} alt="HOD Signature" />
                     ) : (
                       <p>No HOD signature available</p>
                     )}
@@ -263,7 +255,7 @@ if (loading) return <p>Loading...</p>;
                       <div key={user._id} className="logistic-user">
                         <p>{user.firstName} {user.lastName}</p>
                         {user.signature ? (
-                          <img src={`http://localhost:5000/${user.signature}`}  />
+                          <img src={`${process.env.REACT_APP_BACKEND_URL}/${user.signature}`}  />
                         ) : (
                           <p>No signature available</p>
                         )}

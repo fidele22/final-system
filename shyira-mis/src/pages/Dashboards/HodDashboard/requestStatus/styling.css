@@ -19,7 +19,9 @@
     text-decoration: none;
 }
 
-
+.request-details{
+    margin-top: 2rem;
+}
 /**section of signature***/
 .hod-signature p{
     font-size: 12px;

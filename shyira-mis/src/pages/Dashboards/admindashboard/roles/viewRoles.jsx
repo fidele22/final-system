@@ -30,7 +30,21 @@ const ViewPosition = () => {
     'view_fuel_stock',
     'view_item_report',
     'view_fuel_report',
-    'view_fuel_report',
+    'view-stock-items',
+    'verify-logistic-item-request',
+    'Verify-logistic-fuel-request',
+    'Approve-logistic-request',
+    'approve-fuel-logistic-request',
+    'Repair-logistic-request',
+    'approve-repair-logistic-request',
+    'Approve-user-item-request',
+    'Approve-user-fuel-request',
+    'view-user-requisition',
+    'View-user-fuel-request',
+
+
+
+
 
 
     
@@ -129,7 +143,26 @@ const ViewPosition = () => {
   };
 
   return (
-    <div className="service-data">
+    <div className="role-privilegies-section">
+       <label htmlFor="">Roles and its particular privileges</label>
+         <div className="role-privileges">
+       
+        {roles.map((role) => (
+          <div key={role._id} className={role.name.toLowerCase()}>
+            <h2>{role.name.toUpperCase()}</h2>
+            <ul>
+              {Array.isArray(role.privileges) && role.privileges.length > 0 ? (
+                role.privileges.map((privilege, index) => (
+                  <li key={index}>{privilege}</li>
+                ))
+              ) : (
+                <li>No privileges assigned.</li>
+              )}
+            </ul>
+          </div>
+        ))}
+      </div>
+
       <div className="service-table-data">
         <h1>Role Management</h1>
 
@@ -158,23 +191,7 @@ const ViewPosition = () => {
           </tbody>
         </table>
       </div>
-      <div className="role-privileges">
-        <label htmlFor="">Roles and its particular privileges</label>
-        {roles.map((role) => (
-          <div key={role._id} className={role.name.toLowerCase()}>
-            <h2>{role.name.toUpperCase()}</h2>
-            <ul>
-              {Array.isArray(role.privileges) && role.privileges.length > 0 ? (
-                role.privileges.map((privilege, index) => (
-                  <li key={index}>{privilege}</li>
-                ))
-              ) : (
-                <li>No privileges assigned.</li>
-              )}
-            </ul>
-          </div>
-        ))}
-      </div>
+   
 
       {editRole && (
         <div className="editing-userdata-overlay">

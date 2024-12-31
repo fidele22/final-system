@@ -32,11 +32,8 @@ const Navbar = ({ setCurrentPage }) => {
         <li onClick={() => setCurrentPage('view-logistic-request')}><FaClipboardList /> Logistic Item requisition</li>
         <li onClick={() => setCurrentPage('fuel-logistic-request')}><FaGasPump /> Logistic Fuel requisition</li>
         <li onClick={() => setCurrentPage('repair-logistic-request')}><FaGasPump /> Logistic Repair requisition</li>
-        <li onClick={() => setCurrentPage('user-request')}><FaBoxOpen /> User itemrequisition</li>
-
-        <li onClick={() => setCurrentPage('fuel-requisition')}>
-                <FaClipboardCheck /> User Fuel Requisition </li>
-          
+        <li onClick={() => setCurrentPage('user-request')}><FaBoxOpen />User itemrequisition</li>
+        <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> User Fuel Requisition </li>
       </ul>
       
       <u><h2>Settings</h2></u>

@@ -187,7 +187,7 @@ const ApprovedRequests = () => {
 
 
       {selectedRequest && (
-        <div className="approved-request-overlay">
+        <div className="request-overlay">
           <div className="form-navigation">
             <button className='request-dowload-btn' onClick={downloadPDF}>Download PDF</button>
             <button className='mark-received-btn' onClick={() => handleReceivedClick(selectedRequest._id)}>Mark as Received</button>
@@ -231,13 +231,14 @@ const ApprovedRequests = () => {
               <div>
 
               </div>
-              <div className="approved-signature-section">
+              <div className="signature-section">
                 <div className='hod-signature'>
                   <h5>Name of Head of Department:</h5>
                   <label>Prepared By:</label>
                   <p>{selectedRequest.hodName}</p>
                   {selectedRequest.hodSignature ? (
-                    <img src={`http://localhost:5000/${selectedRequest.hodSignature}`} alt="HOD Signature" />
+                    <img src={`${process.env.REACT_APP_BACKEND_URL}/${selectedRequest.hodSignature}`} alt="HOD Signature" 
+                    className='signature-img' />
                   ) : (
                     <p>No HOD signature available</p>
                   )}
@@ -249,7 +250,8 @@ const ApprovedRequests = () => {
                     <div key={user._id} className="logistic-user">
                       <p>{user.firstName} {user.lastName}</p>
                       {user.signature ? (
-                        <img src={`http://localhost:5000/${user.signature}`} alt={`${user.firstName} ${user.lastName} Signature`} />
+                        <img src={`${process.env.REACT_APP_BACKEND_URL}/${user.signature}`} alt={`${user.firstName} ${user.lastName} Signature`} 
+                        className='signature-img'/>
                       ) : (
                         <p>No signature available</p>
                       )}
@@ -263,7 +265,8 @@ const ApprovedRequests = () => {
                     <div key={user._id} className="logistic-user">
                       <p>{user.firstName} {user.lastName}</p>
                       {user.signature ? (
-                        <img src={`http://localhost:5000/${user.signature}`} alt={`${user.firstName} ${user.lastName} Signature`} />
+                        <img src={`${process.env.REACT_APP_BACKEND_URL}/${user.signature}`} alt={`${user.firstName} ${user.lastName} Signature`} 
+                        className='signature-img' />
                       ) : (
                         <p>No signature available</p>
                       )}

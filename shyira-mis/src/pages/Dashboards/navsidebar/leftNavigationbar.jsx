@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { FaHome, FaList, FaBoxOpen, FaUser,FaPlus,
+import { FaHome, FaList, FaBoxOpen, FaUser,FaPlus,FaGasPump,FaClipboardList,
   FaChartBar,FaClipboardCheck, FaLifeRing } from 'react-icons/fa';
-import './Hodnavigationbar.css';
+import './navigationbar.css';
 
 const Navbar = ({ setCurrentPage, privileges }) => {
   const [dropdownsOpen, setDropdownsOpen] = useState({
@@ -43,13 +43,13 @@ const Navbar = ({ setCurrentPage, privileges }) => {
         {/* links supposed to logistic role */}
 
         {privileges.includes('Manage_item_stock') && (
-          <li onClick={() => setCurrentPage('view-items-stock')}> <FaList /> Item stock </li>
+          <li onClick={() => setCurrentPage('manage-items-stock')}> <FaList /> Manage Item stock </li>
         )}
         {privileges.includes('Make_item_order') && (
           <li onClick={() => setCurrentPage('make-order')}><FaClipboardCheck /> Order Supplies  </li>
         )}
         {privileges.includes('view_request_item') && (
-          <li onClick={() => setCurrentPage('view-requisition')}><FaClipboardCheck /> Item Requisition</li>
+          <li onClick={() => setCurrentPage('item-requisition')}><FaClipboardCheck /> Item Requisition</li>
         )}
         {privileges.includes('view_request_fuel') && (
           <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> Fuel Requisition</li>
@@ -66,13 +66,47 @@ const Navbar = ({ setCurrentPage, privileges }) => {
         {privileges.includes('view_fuel_report') && (
           <li onClick={() => setCurrentPage('fuel-report')}><FaChartBar /> Fuel Report </li>
         )}   
-       {privileges.includes('view_fuel_report') && (
-          <li onClick={() => setCurrentPage('fuel-report')}><FaChartBar /> Fuel Report </li>
-        )}
 
          {/*links supposed to go on daf  */}
-         
-      </ul>
+     
+        {privileges.includes('view-stock-items') && (
+           <li onClick={() => setCurrentPage('view-stock-items')}> <FaList /> stock Items</li>
+        )}
+        {privileges.includes('verify-logistic-item-request') && (
+             <li onClick={() => setCurrentPage('view-logistic-request')}><FaBoxOpen /> Logistic Item Requisition </li>
+        )}
+        {privileges.includes('Verify-logistic-fuel-request') && (
+                <li onClick={() => setCurrentPage('Fuel-logistic-Order')}><FaGasPump /> Logistic Fuel Requisition </li>
+        )}
+        {privileges.includes('Repair-logistic-request') && (
+               <li onClick={() => setCurrentPage('Repair-logistic-Order')}><FaGasPump /> Logistic Repair Requisition </li>
+        )} 
+       {privileges.includes('Approve-user-item-request') && (
+         <li onClick={() => setCurrentPage('user-item-request')}><FaClipboardList /> User Item Requisition</li>  
+        )}
+
+       {privileges.includes('Approve-user-fuel-request') && (
+        <li onClick={() => setCurrentPage('user-fuel-request')}><FaGasPump />  User Fuel Requisition</li>
+        )}   
+
+             {/*links supposed to go on DG  */}
+
+        {privileges.includes('Approve-logistic-request') && (
+         <li onClick={() => setCurrentPage('view-logistic-request')}><FaClipboardList /> Logistic Item requisition</li>
+        )}
+        {privileges.includes('approve-fuel-logistic-request') && (
+                   <li onClick={() => setCurrentPage('fuel-logistic-request')}><FaGasPump /> Logistic Fuel requisition</li>
+        )}
+        {privileges.includes('approve-repair-logistic-request') && (
+          <li onClick={() => setCurrentPage('repair-logistic-request')}><FaGasPump /> Logistic Repair requisition</li>
+        )}
+        {privileges.includes('view-user-requisition') && (
+          <li onClick={() => setCurrentPage('user-request')}><FaBoxOpen />User item requisition</li>
+        )}
+        {privileges.includes('View-user-fuel-request') && (
+        <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> User Fuel Requisition </li>
+        )}
+       </ul>
     </div>
   );
 };
