@@ -60,12 +60,7 @@ const Navbar = ({ setCurrentPage, privileges }) => {
         {privileges.includes('view_fuel_stock') && (
          <li onClick={() => setCurrentPage('fuel-stock')}><FaPlus /> Fuel stock</li>
         )}
-         {privileges.includes('view_item_report') && (
-          <li onClick={() => setCurrentPage('report')}><FaChartBar /> Item Report</li>
-        )} 
-        {privileges.includes('view_fuel_report') && (
-          <li onClick={() => setCurrentPage('fuel-report')}><FaChartBar /> Fuel Report </li>
-        )}   
+        
 
          {/*links supposed to go on daf  */}
      
@@ -106,6 +101,14 @@ const Navbar = ({ setCurrentPage, privileges }) => {
         {privileges.includes('View-user-fuel-request') && (
         <li onClick={() => setCurrentPage('fuel-requisition')}><FaClipboardCheck /> User Fuel Requisition </li>
         )}
+
+        {/* links shared  */}
+        {privileges.includes('view_item_report') && (
+          <li onClick={() => setCurrentPage('report')}><FaChartBar /> Item Report</li>
+        )} 
+        {privileges.includes('view_fuel_report') && (
+          <li onClick={() => setCurrentPage('fuel-report')}><FaChartBar /> Fuel Report </li>
+        )}  
        </ul>
     </div>
   );

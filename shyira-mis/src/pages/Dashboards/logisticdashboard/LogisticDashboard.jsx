@@ -10,7 +10,7 @@ import MakeRequist from './OrderSupply/MakeRequist';
 import FuelOrder from './OrderSupply/fuelorder';
 import ViewCars from './fuelRequisition/viewcars';
 import LogisticProfile from '../UserProfile/profile';
-import StockReport from './StockReport/ItemReport';
+import ItemStockReport from './StockReport/ItemReport';
 import ViewRequisition from './UserRequisitions/RequisitionsPages';
 import ViewFuelRequest from './fuelRequisition/fuelRequisitionPages';
 import FuelStock from './fuelRequisition/fuelStock';
@@ -57,7 +57,7 @@ const LogisticDashboard = () => {
       case 'manage-items-stock':
         return <ViewItem />;
       case 'report':
-        return <StockReport />;
+        return <ItemStockReport />;
       case 'fuel-report':
         return <FuelReport />;
       case 'fuel-stock':
