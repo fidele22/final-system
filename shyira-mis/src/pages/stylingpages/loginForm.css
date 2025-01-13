@@ -1,7 +1,17 @@
 
 body{
-  background-color: rgb(227, 226, 226);
+  background-image: url('../../../public//image/shyiraDH.jpg');
+  background-size: cover; /* This will make the image cover the entire background */
+  /* background-position: center; This will center the image */
+  background-repeat: no-repeat;
+  opacity: 1; /* Adjust this value for desired brightness (0 to 1) */
+
+  z-index: 1; 
   overflow-x: hidden;
+}
+body.logged-in {
+  background-color: rgb(227, 226, 226);
+  background-image: none;
 }
 p {
   font-size: 12px;

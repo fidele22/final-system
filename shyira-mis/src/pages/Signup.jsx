@@ -19,6 +19,7 @@ const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   // Add state for password visibility toggle
 const [showPassword, setShowPassword] = useState(false);
@@ -52,6 +53,12 @@ const togglePasswordVisibility = () => {
         const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, { email, password });
   
         console.log('Login response:', res.data); // Check what is returned
+  
+          // Set login status to true
+
+          setIsLoggedIn(true);
+
+          document.body.classList.add('logged-in'); // Add class to body
   
         const { token, role, privileges } = res.data; // Destructure privileges from response
   
@@ -255,6 +262,8 @@ const togglePasswordVisibility = () => {
 
   return (
     <div className={`container ${isSignUp ? 'right-panel-active' : ''}`} id="container">
+
+      
       {/* {login form} */}
       <div className="form-container sign-in-container">
         <form onSubmit={handleSubmit}>
